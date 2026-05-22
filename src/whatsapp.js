@@ -1,6 +1,15 @@
 const twilio = require("twilio");
 const config = require("./config");
-const { solveTextDoubt, solveImageDoubt, resetConversation } = require("./gemini");
+const {
+  solveTextDoubt,
+  solveImageDoubt,
+  resetConversation,
+  setProvider,
+  getProvider,
+  getAvailableProviders,
+  getProviderListMessage,
+  PROVIDER_INFO,
+} = require("./ai-engine");
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
@@ -158,6 +167,34 @@ async function handleIncomingMessage(req, res) {
       return;
     }
 
+    // /models — List available AI models
+    if (messageText.toLowerCase() === "/models") {
+      await sendReply(from, getProviderListMessage(userId));
+      return;
+    }
+
+    // /model <provider> — Switch AI model
+    if (messageText.toLowerCase().startsWith("/model ")) {
+      const requested = messageText.substring(7).trim().toLowerCase();
+      const available = getAvailableProviders();
+      const validProviders = Object.keys(PROVIDER_INFO);
+
+      if (!validProviders.includes(requested)) {
+        await sendReply(from, `❌ Unknown model: *${requested}*\n\nAvailable: ${validProviders.join(", ")}\nUse /models to see all options.`);
+        return;
+      }
+
+      if (!available.includes(requested)) {
+        await sendReply(from, `❌ *${PROVIDER_INFO[requested].name}* is not configured (no API key).\n\nUse /models to see available models.`);
+        return;
+      }
+
+      setProvider(userId, requested);
+      const info = PROVIDER_INFO[requested];
+      await sendReply(from, `${info.emoji} Switched to *${info.name}*! ✅\n\nYour conversation history has been reset. Ask me anything!`);
+      return;
+    }
+
     // Handle image messages (student sent a photo of a problem)
     if (parseInt(numMedia) > 0 && MediaUrl0) {
       await sendReply(from, "📷 Got your image! Analyzing the problem... ⏳");
@@ -200,13 +237,19 @@ I'm your AI tutor — available 24/7 to solve any academic doubt.
 • Answer questions across 100+ subjects
 • Analyze photos of handwritten/printed problems
 • Reply in Tamil, Hindi, Telugu, English & more
+• Switch between multiple AI models on-the-fly
 
 💡 *How to use:*
 1. Just type your question
 2. Or snap a photo of a problem and send it
 3. I'll reply in YOUR language automatically!
 
+🤖 *AI Models:*
+🟢 Google Gemini  |  🟡 ChatGPT  |  🟠 Claude  |  🔵 Kimi
+
 🔧 *Commands:*
+/models — See available AI models
+/model gemini — Switch AI model
 /help — See what I can do
 /reset — Start a fresh conversation
 
@@ -238,6 +281,11 @@ function getHelpMessage() {
 • Mention your class/level for tailored answers
 
 *Commands:*
+/models — List AI models & switch
+/model gemini — Switch to Gemini
+/model chatgpt — Switch to ChatGPT
+/model claude — Switch to Claude
+/model kimi — Switch to Kimi
 /reset — Clear chat history
 /help — Show this message
 
