@@ -245,7 +245,7 @@ I'm your AI tutor — available 24/7 to solve any academic doubt.
 3. I'll reply in YOUR language automatically!
 
 🤖 *AI Models:*
-🟢 Google Gemini  |  🟡 ChatGPT  |  🟠 BroadMind AI  |  🔵 Kimi
+🟢 Google Gemini  |  🟡 ChatGPT  |  🟠 Claude  |  🔵 Kimi
 
 🔧 *Commands:*
 /models — See available AI models
@@ -284,7 +284,7 @@ function getHelpMessage() {
 /models — List AI models & switch
 /model gemini — Switch to Gemini
 /model chatgpt — Switch to ChatGPT
-/model claude — Switch to BroadMind AI
+/model claude — Switch to Claude
 /model kimi — Switch to Kimi
 /reset — Clear chat history
 /help — Show this message

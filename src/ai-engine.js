@@ -123,7 +123,7 @@ function getProvider(userId) {
 const PROVIDER_INFO = {
   gemini: { name: "Google Gemini", emoji: "🟢", model: "gemini-1.5-flash" },
   chatgpt: { name: "ChatGPT (GPT-4o)", emoji: "🟡", model: "gpt-4o-mini" },
-  claude: { name: "BroadMind AI", emoji: "🟠", model: "claude-sonnet-4-20250514" },
+  claude: { name: "Claude", emoji: "🟠", model: "claude-sonnet-4-20250514" },
   kimi: { name: "Kimi (Moonshot)", emoji: "🔵", model: "moonshot-v1-8k" },
 };
 
@@ -250,11 +250,11 @@ async function chatgptImage(imagePath, caption) {
   return result.choices[0].message.content;
 }
 
-// ── BroadMind AI Provider ───────────────────────────────────────────
+// ── Claude Provider ─────────────────────────────────────────────────
 
 async function claudeText(userId, question) {
   const client = getClaude();
-  if (!client) throw new Error("BroadMind AI API key not configured");
+  if (!client) throw new Error("Claude API key not configured");
 
   const state = getUserState(userId);
   const messages = [
@@ -274,7 +274,7 @@ async function claudeText(userId, question) {
 
 async function claudeImage(imagePath, caption) {
   const client = getClaude();
-  if (!client) throw new Error("BroadMind AI API key not configured");
+  if (!client) throw new Error("Claude API key not configured");
 
   const imageData = fs.readFileSync(imagePath);
   const base64 = imageData.toString("base64");
